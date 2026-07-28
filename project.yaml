@@ -1,0 +1,4 @@
+modules:
+  - ktor-data
+  - ktor-data-exposed-r2dbc
+  - ktor-data-serialization

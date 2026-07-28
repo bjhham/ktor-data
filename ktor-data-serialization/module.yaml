@@ -1,0 +1,12 @@
+product:
+  type: kmp/lib
+  platforms: [ jvm, android, iosArm64, iosSimulatorArm64, iosX64 ]
+dependencies:
+  - ../ktor-data
+  - $kotlin.serialization.core
+test-dependencies:
+  - $kotlin.serialization.json
+  - org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0
+settings:
+  kotlin:
+    serialization: enabled
