@@ -31,15 +31,19 @@ class ListRepository<E: Identifiable<ID>, ID>(
     }
     private val updateMutex = Mutex()
 
-    override fun where(predicate: Predicate): Selection<E> =
+    override fun find(predicate: Predicate): Selection<E> =
         ListSelection(predicate.toBooleanFunction())
 
-    override suspend fun create(e: E): E =
+    override suspend fun create(e: E) {
+        createAndGet(e)
+    }
+
+    override suspend fun createAndGet(e: E): E =
         withNewId(e, nextId()).also {
             list += it
         }
 
-    override suspend fun create(items: Iterable<E>) {
+    override suspend fun createAll(items: Collection<E>) {
         for (it in items)
             create(it)
     }
@@ -48,6 +52,19 @@ class ListRepository<E: Identifiable<ID>, ID>(
         updateMutex.withLock {
             list = list.map {
                 if (it.id == e.id) e else it
+            }
+        }
+    }
+
+    override suspend fun updateAndGet(e: E): E {
+        update(e)
+        return e
+    }
+
+    override suspend fun updateAll(items: Collection<E>) {
+        updateMutex.withLock {
+            list = list.map { item ->
+                items.find { it.id == item.id } ?: item
             }
         }
     }
@@ -73,7 +90,7 @@ class ListRepository<E: Identifiable<ID>, ID>(
             return items.asPage(total = matches.size.toUInt())
         }
 
-        override suspend fun updateAll(values: FieldValues) {
+        override suspend fun patchAll(values: FieldValues) {
             updateMutex.withLock {
                 list = list.map(values.toMappingFunction())
             }
@@ -87,6 +104,9 @@ class ListRepository<E: Identifiable<ID>, ID>(
 
         override suspend fun single(): E =
             list.single(predicate)
+
+        override suspend fun count(): UInt =
+            list.count(predicate).toUInt()
     }
 }
 

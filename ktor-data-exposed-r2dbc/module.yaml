@@ -1,3 +1,17 @@
 product:
   type: kmp/lib
   platforms: [ jvm ]
+dependencies:
+  - ../ktor-data
+  - ../ktor-data-serialization
+  - $kotlin.serialization.core
+  - org.jetbrains.exposed:exposed-core:1.2.0
+  - org.jetbrains.exposed:exposed-r2dbc:1.2.0
+  - org.jetbrains.exposed:exposed-kotlin-datetime:1.2.0
+test-dependencies:
+  - org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0
+  - com.h2database:h2:2.3.232
+  - io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+settings:
+  kotlin:
+    serialization: enabled

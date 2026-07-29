@@ -14,8 +14,8 @@ class ListRepositoryTest {
     @Test
     fun `basic CRUD`() = runTest {
         val examples = ListRepository<Example>()
-        val first = examples.create(Example(name = "First"))
-        val second = examples.create(Example(name = "Second"))
+        val first = examples.createAndGet(Example(name = "First"))
+        val second = examples.createAndGet(Example(name = "Second"))
         assertEquals(listOf(first, second), examples.all().list())
         val updated = first.copy(name = "Updated")
         examples.update(updated)
@@ -27,11 +27,11 @@ class ListRepositoryTest {
     @Test
     fun `nested objects`() = runTest {
         val nestedObjects = ListRepository<Nested>()
-        val first = nestedObjects.create(Nested(
+        val first = nestedObjects.createAndGet(Nested(
             examples = listOf(Example(name = "First")),
             attributes = mapOf("key" to "value")
         ))
-        val second = nestedObjects.create(Nested(
+        val second = nestedObjects.createAndGet(Nested(
             examples = listOf(Example(name = "Second")),
             attributes = mapOf("key" to "value")
         ))
@@ -46,22 +46,22 @@ class ListRepositoryTest {
     @Test
     fun querying() = runTest {
         val examples = ListRepository<Example>()
-        examples.create(listOf(
+        examples.createAll(listOf(
             Example(name = "First"),
             Example(name = "Second"),
             Example(name = "Third"),
             Example(name = "Fourth"),
         ))
-        assertEquals(3u, examples.where(name.isEqualTo("Third")).single().id)
-        assertEquals(2u, examples.where(name.isOneOf("First", "Second") and name.isEqualTo("Second")).single().id)
-        assertEquals(listOf(1u, 4u), examples.where(name.isEqualTo("First") or name.isEqualTo("Fourth")).list().map { it.id })
-        assertEquals(listOf(1u, 2u), examples.where(name.isOneOf("First", "Second")).list().map { it.id })
+        assertEquals(3u, examples.find(name.isEqualTo("Third")).single().id)
+        assertEquals(2u, examples.find(name.isOneOf("First", "Second") and name.isEqualTo("Second")).single().id)
+        assertEquals(listOf(1u, 4u), examples.find(name.isEqualTo("First") or name.isEqualTo("Fourth")).list().map { it.id })
+        assertEquals(listOf(1u, 2u), examples.find(name.isOneOf("First", "Second")).list().map { it.id })
     }
 
     @Test
     fun paging() = runTest {
         val examples = ListRepository<Example>()
-        examples.create(listOf(
+        examples.createAll(listOf(
             Example(name = "First"),
             Example(name = "Second"),
             Example(name = "Third"),
@@ -80,7 +80,7 @@ class ListRepositoryTest {
         assertEquals(listOf(1u, 2u, 3u, 4u), capped.map { it.id })
         assertEquals(4u, capped.total)
 
-        val filtered = examples.where(name.isOneOf("First", "Second", "Third")).page(limit = 2u)
+        val filtered = examples.find(name.isOneOf("First", "Second", "Third")).page(limit = 2u)
         assertEquals(listOf(1u, 2u), filtered.map { it.id })
         assertEquals(3u, filtered.total)
 

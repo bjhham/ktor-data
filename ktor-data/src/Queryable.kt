@@ -11,7 +11,7 @@ interface Queryable<out E> {
     /**
      * Get a selection of all entities.
      */
-    fun all(): Selection<E> = where(Everything)
+    fun all(): Selection<E> = find(Everything)
 
     /**
      * Get a selection of entities matching the given predicate.
@@ -20,7 +20,7 @@ interface Queryable<out E> {
      *
      * @param predicate the criteria the rows must match
      */
-    fun where(predicate: Predicate): Selection<E>
+    fun find(predicate: Predicate): Selection<E>
 }
 
 /**
@@ -34,11 +34,13 @@ interface Selection<out E> {
     suspend fun list(): List<E>
     suspend fun page(limit: UInt? = null, offset: UInt? = null): Page<E>
 
-    suspend fun updateAll(values: FieldValues)
+    suspend fun patchAll(values: FieldValues)
 
     suspend fun deleteAll()
 
     suspend fun single(): E
+
+    suspend fun count(): UInt
 }
 
 typealias FieldValues = Map<Field<*>, Any?>
