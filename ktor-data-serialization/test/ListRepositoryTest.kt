@@ -87,7 +87,7 @@ class ListRepositoryTest {
         assertEquals(3u, filtered.total)
 
         val none = examples.all().page(limit = 0u)
-        assertEquals(emptyList(), none.items)
+        assertEquals(emptyList(), none.toList())
         assertEquals(4u, none.total)
     }
 

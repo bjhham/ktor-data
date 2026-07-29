@@ -51,7 +51,8 @@ class ListRepository<E: Identifiable<ID>, ID>(
     override suspend fun update(e: E) {
         updateMutex.withLock {
             list = list.map {
-                if (it.id == e.id) e else it
+                if (it.id == e.id) e
+                else it
             }
         }
     }
@@ -92,7 +93,8 @@ class ListRepository<E: Identifiable<ID>, ID>(
 
         override suspend fun patchAll(values: FieldValues) {
             updateMutex.withLock {
-                list = list.map(values.toMappingFunction())
+                val mappingFunction = values.toMappingFunction()
+                list = list.map { if (predicate(it)) mappingFunction(it) else it }
             }
         }
 
@@ -109,4 +111,3 @@ class ListRepository<E: Identifiable<ID>, ID>(
             list.count(predicate).toUInt()
     }
 }
-

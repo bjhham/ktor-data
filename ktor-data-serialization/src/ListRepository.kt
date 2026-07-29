@@ -12,10 +12,17 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
 
 /**
- * Create a new Repository from a list of serializable elements.  Useful short-hand for testing.
+ * Create a new ListRepository from a list of serializable elements.
  */
 inline fun <reified E: Identifiable<UInt>> ListRepository(list: List<E> = emptyList()): Repository<E, UInt> {
     require(list.all { it.id > 0u }) { "All elements must have a positive id" }
+    return ListRepository(list, nextUIntId(list))
+}
+
+/**
+ * Create a new ListRepository from a list of serializable elements.
+ */
+inline fun <reified E: Identifiable<ID>, ID> ListRepository(list: List<E> = emptyList(), noinline nextId: () -> ID): Repository<E, ID> {
     val serializer = try {
         serializer<E>()
     } catch (e: SerializationException) {
@@ -23,8 +30,8 @@ inline fun <reified E: Identifiable<UInt>> ListRepository(list: List<E> = emptyL
     }
     return ListRepository(
         list = list.toMutableList(),
-        nextId = nextUIntId(list),
-        withNewId = { e: E, id: UInt ->
+        nextId = nextId,
+        withNewId = { e: E, id: ID ->
             serializer.deserialize(
                 CopyAndReplaceIdDecoder(
                     source = e.toMap(serializer),

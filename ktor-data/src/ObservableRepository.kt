@@ -2,9 +2,7 @@ package io.ktor.data
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 
 interface ObservableRepository<E: Identifiable<ID>, ID>: Repository<E, ID> {
 
@@ -15,27 +13,29 @@ interface ObservableRepository<E: Identifiable<ID>, ID>: Repository<E, ID> {
 
 interface ObservableSelection<out E: Identifiable<ID>, ID>: Selection<E> {
     suspend fun listFlow(): Flow<List<E>> = flow {
-        val list = list()
-        emit(list)
-        emitAll(changeFlow().map { change ->
-            when (change) {
-                is ChangeEvent.Created<E> -> list + change.entity
-                is ChangeEvent.Updated<E> -> list.map { if (it.id == change.entity.id) change.entity else it }
-                is ChangeEvent.Deleted<E, *> -> list.filterNot { it.id == change.id }
+        var current = list()
+        emit(current)
+        changeFlow().collect { change ->
+            current = when (change) {
+                is ChangeEvent.Created<E> -> current + change.entity
+                is ChangeEvent.Updated<E> -> current.map { if (it.id == change.entity.id) change.entity else it }
+                is ChangeEvent.Deleted<E, *> -> current.filterNot { it.id == change.id }
             }
-        })
+            emit(current)
+        }
     }
     suspend fun pageFlow(limit: UInt? = null, offset: UInt? = null): Flow<Page<E>> = flow {
-        val page = page()
-        val currentTotal = atomic(page.total.toLong())
-        emit(page)
-        emitAll(changeFlow().map { change ->
-            when (change) {
-                is ChangeEvent.Created<E> -> (page + change.entity).asPage(total = currentTotal.incrementAndGet().toUInt())
-                is ChangeEvent.Updated<E> -> page.map { if (it.id == change.entity.id) change.entity else it }.asPage(total = currentTotal.value.toUInt())
-                is ChangeEvent.Deleted<E, *> -> page.filterNot { it.id == change.id }.asPage(total = currentTotal.decrementAndGet().toUInt())
+        var current = page(limit, offset)
+        val currentTotal = atomic(current.total.toLong())
+        emit(current)
+        changeFlow().collect { change ->
+            current = when (change) {
+                is ChangeEvent.Created<E> -> (current + change.entity).asPage(total = currentTotal.incrementAndGet().toUInt())
+                is ChangeEvent.Updated<E> -> current.map { if (it.id == change.entity.id) change.entity else it }.asPage(total = currentTotal.value.toUInt())
+                is ChangeEvent.Deleted<E, *> -> current.filterNot { it.id == change.id }.asPage(total = currentTotal.decrementAndGet().toUInt())
             }
-        })
+            emit(current)
+        }
     }
     suspend fun changeFlow(): Flow<ChangeEvent<E>>
 }
