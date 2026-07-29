@@ -25,9 +25,11 @@ examples.delete(second.id)
 assertEquals(listOf(updated), examples.all().list())
 ```
 
-### Implementations
+### Repositories
 
-- [ObservableRepository](ktor-data/src/ObservableRepository.kt) for real-time subscriptions for APIs that support it.
+- [ListRepository](ktor-data/src/ListRepository.kt) the simplest implementation of a repository using a list.
+- [ObservableRepository](ktor-data/src/ObservableRepository.kt) an interface for real-time subscriptions for APIs that support it.
+- [ObservableListRepository](ktor-data/src/ObservableListRepository.kt) an example implementation of the ObservableRepository using a list.
 - [ExposedR2dbcRepository](ktor-data-exposed-r2dbc/src/ExposedR2dbcRepository.kt) that illustrates
   how we can adapt this library for [Exposed](https://github.com/JetBrains/Exposed).
 
