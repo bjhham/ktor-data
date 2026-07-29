@@ -34,7 +34,6 @@ interface Repository<E, in ID> : EntitySource<E>, Lookup<ID, E>, EntitySink<E, I
      * @param predicate The predicate used to filter entities.
      */
     override fun find(predicate: Predicate): Selection<E>
-
 }
 
 /**

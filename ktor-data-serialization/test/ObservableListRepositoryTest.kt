@@ -1,15 +1,12 @@
 package io.ktor.data.serialization
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import io.ktor.data.*
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
-import kotlin.collections.emptyList
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ObservableListRepositoryTest {
 

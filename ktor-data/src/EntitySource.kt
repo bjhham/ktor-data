@@ -3,7 +3,7 @@ package io.ktor.data
 import io.ktor.data.Predicate.Everything
 
 /**
- * Interface for querying entities that implement the [Identifiable] interface.
+ * Interface for querying entities.
  *
  * @param E The type of entities being queried, constrained to types that implement [Identifiable].
  */
@@ -47,8 +47,6 @@ interface Selection<out E>: SearchResult<E> {
 
 typealias FieldValues = Map<Field<*>, Any?>
 
-suspend inline fun <E> Selection<E>.forEach(op: (E) -> Unit) =
-    list().forEach(op)
 
 /**
  * List wrapper for a limited view of a larger source of data.
@@ -58,6 +56,9 @@ suspend inline fun <E> Selection<E>.forEach(op: (E) -> Unit) =
 interface Page<out E>: List<E> {
     val total: UInt
 }
+
+suspend inline fun <E> Selection<E>.forEach(op: (E) -> Unit) =
+    list().forEach(op)
 
 /**
  * Wrap the current list as a page
