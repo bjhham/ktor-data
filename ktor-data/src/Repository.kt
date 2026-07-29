@@ -6,7 +6,7 @@ package io.ktor.data
  * @param E The type of the entity to be managed. Must extend Identifiable with the given ID type.
  * @param ID The type of the identifier for the entities being managed.
  */
-interface Repository<E, in ID> : Queryable<E>, Lookup<ID, E>, EntitySink<E, ID> {
+interface Repository<E, in ID> : EntitySource<E>, Lookup<ID, E>, EntitySink<E, ID> {
     /**
      * Create an entity and get a new copy with all automatically generated fields populated.
      *
@@ -22,6 +22,19 @@ interface Repository<E, in ID> : Queryable<E>, Lookup<ID, E>, EntitySink<E, ID> 
      * @return A new copy of the entity with all automatically generated fields populated.
      */
     suspend fun updateAndGet(e: E): E
+
+    /**
+     * Provides a mutable selection of all entities in the repository.
+     */
+    override fun all(): Selection<E> = find(Predicate.Everything)
+
+    /**
+     * Provides a mutable selection of entities based on the given predicate.
+     *
+     * @param predicate The predicate used to filter entities.
+     */
+    override fun find(predicate: Predicate): Selection<E>
+
 }
 
 /**

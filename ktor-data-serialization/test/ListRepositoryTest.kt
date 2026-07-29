@@ -17,9 +17,11 @@ class ListRepositoryTest {
         val first = examples.createAndGet(Example(name = "First"))
         val second = examples.createAndGet(Example(name = "Second"))
         assertEquals(listOf(first, second), examples.all().list())
+
         val updated = first.copy(name = "Updated")
         examples.update(updated)
         assertEquals(updated, examples.get(first.id))
+
         examples.delete(second.id)
         assertEquals(listOf(updated), examples.all().list())
     }
