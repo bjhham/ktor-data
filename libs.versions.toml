@@ -1,0 +1,20 @@
+[versions]
+supabase = "3.6.0"
+exposed = "1.2.0"
+coroutines = "1.11.0"
+atomicfu = "0.33.0"
+h2 = "2.3.232"
+r2dbc = "1.0.0.RELEASE"
+
+[libraries]
+d2db-h2 =  { module = "com.h2database:h2", version.ref = "h2" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-r2dbc = { module = "org.jetbrains.exposed:exposed-r2dbc", version.ref = "exposed" }
+exposed-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+r2dbc-h2 =  { module = "io.r2dbc:r2dbc-h2", version.ref = "r2dbc" }
+supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabase" }
+supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }
+supabase-realtime = { module = "io.github.jan-tennert.supabase:realtime-kt", version.ref = "supabase" }

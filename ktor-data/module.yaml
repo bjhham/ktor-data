@@ -2,5 +2,5 @@ product:
   type: kmp/lib
   platforms: [ jvm, android, iosArm64, iosSimulatorArm64, iosX64 ]
 dependencies:
-  - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0
-  - org.jetbrains.kotlinx:atomicfu:0.33.0
+  - $libs.kotlinx.coroutines.core
+  - $libs.kotlinx.atomicfu

@@ -6,7 +6,9 @@ dependencies:
   - $kotlin.serialization.core
 test-dependencies:
   - $kotlin.serialization.json
-  - org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0
+  - $libs.kotlinx.coroutines.test
 settings:
   kotlin:
-    serialization: enabled
+    serialization:
+      enabled: true
+      version: 1.11.0

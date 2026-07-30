@@ -32,4 +32,7 @@ assertEquals(listOf(updated), examples.all().list())
 - [ObservableListRepository](ktor-data/src/ObservableListRepository.kt) an example implementation of the ObservableRepository using a list.
 - [ExposedR2dbcRepository](ktor-data-exposed-r2dbc/src/ExposedR2dbcRepository.kt) that illustrates
   how we can adapt this library for [Exposed](https://github.com/JetBrains/Exposed).
+- [SupabaseRepository](ktor-data-supabase/src/SupabaseRepository.kt) an ObservableRepository backed by
+  [supabase-kt](https://github.com/supabase-community/supabase-kt), reading and writing through
+  PostgREST and streaming changes from the Realtime API.
 

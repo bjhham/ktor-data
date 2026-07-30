@@ -5,13 +5,15 @@ dependencies:
   - ../ktor-data
   - ../ktor-data-serialization
   - $kotlin.serialization.core
-  - org.jetbrains.exposed:exposed-core:1.2.0
-  - org.jetbrains.exposed:exposed-r2dbc:1.2.0
-  - org.jetbrains.exposed:exposed-kotlin-datetime:1.2.0
+  - $libs.exposed.core
+  - $libs.exposed.r2dbc
+  - $libs.exposed.datetime
 test-dependencies:
-  - org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0
-  - com.h2database:h2:2.3.232
-  - io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+  - $libs.kotlinx.coroutines.test
+  - $libs.d2db.h2
+  - $libs.r2dbc.h2
 settings:
   kotlin:
-    serialization: enabled
+    serialization:
+      enabled: true
+      version: 1.11.0
