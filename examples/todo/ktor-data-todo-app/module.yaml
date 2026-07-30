@@ -1,0 +1,25 @@
+product: android/app
+
+dependencies:
+  - ../../../ktor-data
+  - ../../../ktor-data-serialization
+  - ../../../ktor-data-rest-client
+  - ../ktor-data-todo-core
+  - $compose.foundation
+  - $compose.material3
+  - $libs.compose.icons
+  - androidx.activity:activity-compose:1.9.3
+  - androidx.appcompat:appcompat:1.7.0
+  - androidx.lifecycle:lifecycle-runtime-compose:2.9.4
+
+settings:
+  compose: enabled
+  android:
+    namespace: "io.ktor.data.todo"
+    applicationId: "io.ktor.data.todo"
+    compileSdk: 35
+    minSdk: 24
+    targetSdk: 35
+
+repositories:
+  - https://redirector.kotlinlang.org/maven/ktor-eap

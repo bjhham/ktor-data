@@ -1,5 +1,10 @@
 modules:
+  - examples/todo/ktor-data-todo-app
+  - examples/todo/ktor-data-todo-core
+  - examples/todo/ktor-data-todo-server
   - ktor-data
   - ktor-data-exposed-r2dbc
-  - ktor-data-supabase
+  - ktor-data-rest-client
+  - ktor-data-rest-server
   - ktor-data-serialization
+  - ktor-data-supabase

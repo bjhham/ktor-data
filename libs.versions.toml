@@ -5,15 +5,21 @@ coroutines = "1.11.0"
 atomicfu = "0.33.0"
 h2 = "2.3.232"
 r2dbc = "1.0.0.RELEASE"
+logback = "1.5.35"
+ktor = "3.6.0-eap-1648"
 
 [libraries]
-d2db-h2 =  { module = "com.h2database:h2", version.ref = "h2" }
+compose-icons = { module = "androidx.compose.material:material-icons-extended", version = "1.7.8" }
+h2db-h2 =  { module = "com.h2database:h2", version.ref = "h2" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-r2dbc = { module = "org.jetbrains.exposed:exposed-r2dbc", version.ref = "exposed" }
 exposed-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
+ktor-server-openapi = { module = "io.ktor:ktor-server-routing-openapi", version.ref = "ktor" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 r2dbc-h2 =  { module = "io.r2dbc:r2dbc-h2", version.ref = "r2dbc" }
 supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabase" }
 supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }

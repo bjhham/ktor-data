@@ -1,6 +1,7 @@
 product:
   type: kmp/lib
   platforms: [ jvm, android, iosArm64, iosSimulatorArm64, iosX64 ]
+
 dependencies:
   - ../ktor-data
   - ../ktor-data-serialization
@@ -11,11 +12,13 @@ dependencies:
   - $libs.supabase.auth
   - $libs.supabase.postgrest
   - $libs.supabase.realtime
+
 test-dependencies:
   # The repository is tested against a mock engine; a real deployment supplies its own
   # websocket-capable Ktor engine for Realtime.
   - $ktor.client.mock
   - $libs.kotlinx.coroutines.test
+
 settings:
   kotlin:
     serialization:
@@ -23,3 +26,7 @@ settings:
       version: 1.11.0
   ktor:
     enabled: true
+    version: 3.6.0-eap-1648
+
+repositories:
+  - https://redirector.kotlinlang.org/maven/ktor-eap

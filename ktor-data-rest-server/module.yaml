@@ -1,0 +1,15 @@
+product: jvm/lib
+
+dependencies:
+  - ../ktor-data
+  - $ktor.server.core
+  - $ktor.server.contentNegotiation
+  - $libs.ktor.server.openapi
+
+settings:
+  ktor:
+    enabled: true
+    version: 3.6.0-eap-1648
+
+repositories:
+  - https://redirector.kotlinlang.org/maven/ktor-eap

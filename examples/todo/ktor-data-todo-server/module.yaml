@@ -1,0 +1,29 @@
+product: jvm/app
+
+dependencies:
+  - ../ktor-data-todo-core
+  - ../../../ktor-data-exposed-r2dbc
+  - ../../../ktor-data-rest-server
+  - $ktor.server.core
+  - $ktor.server.netty
+  - $ktor.server.contentNegotiation
+  - $ktor.server.statusPages
+  - $ktor.serialization.kotlinx.json
+  - $ktor.server.swagger
+  - $libs.ktor.server.di
+  - $libs.ktor.server.openapi
+  - $libs.logback.classic
+  - $libs.h2db.h2
+  - $libs.r2dbc.h2
+
+settings:
+  ktor:
+    enabled: true
+    version: 3.6.0-eap-1648
+  kotlin:
+    serialization:
+      enabled: true
+      version: 1.11.0
+
+repositories:
+  - https://redirector.kotlinlang.org/maven/ktor-eap

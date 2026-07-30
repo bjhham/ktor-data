@@ -1,6 +1,7 @@
 product:
   type: kmp/lib
   platforms: [ jvm, android, iosArm64, iosSimulatorArm64, iosX64 ]
+
 dependencies:
   - $libs.kotlinx.coroutines.core
   - $libs.kotlinx.atomicfu

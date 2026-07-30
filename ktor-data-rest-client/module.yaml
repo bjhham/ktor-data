@@ -1,0 +1,18 @@
+product:
+  type: lib
+  platforms: [ jvm, android, iosArm64, iosSimulatorArm64, iosX64 ]
+
+dependencies:
+  - $ktor.client.core
+  - $ktor.client.cio
+  - $ktor.client.contentNegotiation
+  - $ktor.serialization.kotlinx.json
+  - ../ktor-data
+
+settings:
+  ktor:
+    enabled: true
+    version: 3.6.0-eap-1648
+
+repositories:
+  - https://redirector.kotlinlang.org/maven/ktor-eap

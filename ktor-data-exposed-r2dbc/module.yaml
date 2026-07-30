@@ -1,17 +1,20 @@
 product:
   type: kmp/lib
   platforms: [ jvm ]
+
 dependencies:
-  - ../ktor-data
-  - ../ktor-data-serialization
+  - ../ktor-data: exported
+  - ../ktor-data-serialization: exported
   - $kotlin.serialization.core
-  - $libs.exposed.core
-  - $libs.exposed.r2dbc
+  - $libs.exposed.core: exported
+  - $libs.exposed.r2dbc: exported
   - $libs.exposed.datetime
+
 test-dependencies:
   - $libs.kotlinx.coroutines.test
-  - $libs.d2db.h2
+  - $libs.h2db.h2
   - $libs.r2dbc.h2
+
 settings:
   kotlin:
     serialization:

@@ -12,7 +12,7 @@ interface ObservableRepository<E: Identifiable<ID>, ID>: Repository<E, ID> {
 }
 
 interface ObservableSelection<out E: Identifiable<ID>, ID>: Selection<E> {
-    suspend fun listFlow(): Flow<List<E>> = flow {
+    fun listFlow(): Flow<List<E>> = flow {
         var current = list()
         emit(current)
         changeFlow().collect { change ->
@@ -24,7 +24,7 @@ interface ObservableSelection<out E: Identifiable<ID>, ID>: Selection<E> {
             emit(current)
         }
     }
-    suspend fun pageFlow(limit: UInt? = null, offset: UInt? = null): Flow<Page<E>> = flow {
+    fun pageFlow(limit: UInt? = null, offset: UInt? = null): Flow<Page<E>> = flow {
         var current = page(limit, offset)
         val currentTotal = atomic(current.total.toLong())
         emit(current)
