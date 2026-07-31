@@ -3,6 +3,7 @@ package io.ktor.data.todo.server
 import TodoItem
 import io.ktor.data.*
 import io.ktor.data.exposed.r2dbc.*
+import io.ktor.data.serialization.NaiveObservableRepository
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 import io.ktor.server.plugins.di.annotations.*
@@ -26,8 +27,10 @@ suspend fun Application.configureDatabase(
         SchemaUtils.create(TodoItems)
     }
     dependencies {
-        provide<Repository<TodoItem, UInt>> {
-            ExposedR2bcRepository(db, TodoItems)
+        provide<ObservableRepository<TodoItem, UInt>> {
+            NaiveObservableRepository(
+                ExposedR2bcRepository(db, TodoItems)
+            )
         }
     }
 }

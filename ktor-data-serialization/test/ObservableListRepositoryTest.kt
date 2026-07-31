@@ -36,7 +36,7 @@ class ObservableListRepositoryTest {
             ChangeEvent.Created(first),
             ChangeEvent.Created(second),
             ChangeEvent.Updated(updated),
-            ChangeEvent.Deleted(second.id, second),
+            ChangeEvent.Deleted(second),
         ), events)
     }
 

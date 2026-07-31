@@ -4,23 +4,34 @@ import io.ktor.data.*
 import io.ktor.data.Predicate.*
 import io.ktor.http.*
 import io.ktor.openapi.*
+import io.ktor.server.application.log
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.routing.openapi.*
+import io.ktor.server.sse.heartbeat
+import io.ktor.server.sse.sse
 import io.ktor.server.util.*
+import io.ktor.sse.ServerSentEvent
 import io.ktor.utils.io.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonNull
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.jvm.jvmErasure
+import kotlin.time.Duration.Companion.seconds
 
 const val DEFAULT_PAGE_SIZE = 50u
 val PAGINATION_PARAM_NAMES = setOf("limit", "offset")
 
 @OptIn(ExperimentalKtorApi::class)
-inline fun <reified E: Identifiable<ID>, reified ID> Route.restEndpoint(
+inline fun <reified E: Identifiable<ID>, reified ID: Any> Route.restEndpoint(
     path: String,
-    repository: Repository<E, ID>
+    repository: Repository<E, ID>,
 ) {
     val entityClass = E::class
     val entityNameSingular = entityClass.simpleName!!.replace(Regex("([a-z])([A-Z])")) {
@@ -95,6 +106,22 @@ inline fun <reified E: Identifiable<ID>, reified ID> Route.restEndpoint(
         }
 
         route("/{id}") {
+
+            get {
+                val id: ID by call.pathParameters
+                val entity = repository.get(id) ?: call.respond(HttpStatusCode.NotFound)
+                call.respond(entity)
+            }.describe {
+                summary = "Get an existing $entityNameSingular"
+                tag(entityTag)
+                parameters {
+                    path("id") {
+                        description = "ID of the $entityNameSingular to retrieve"
+                        schema = jsonSchema<ID>()
+                    }
+                }
+            }
+
             put {
                 val entity = call.receive<E>()
                 require(call.parameters["id"]?.toUInt() == entity.id) { "ID in path and body must match" }
@@ -129,7 +156,7 @@ inline fun <reified E: Identifiable<ID>, reified ID> Route.restEndpoint(
                 parameters {
                     path("id") {
                         description = "ID of the $entityNameSingular to delete"
-                        schema = jsonSchema<Int>()
+                        schema = jsonSchema<ID>()
                     }
                 }
                 responses {
@@ -137,6 +164,25 @@ inline fun <reified E: Identifiable<ID>, reified ID> Route.restEndpoint(
                         description = "Deleted $entityNameSingular"
                     }
                 }
+            }
+        }
+
+        // TODO predicates, custom serialization
+        (repository as? ObservableRepository<E, ID>)?.let {
+            val json = Json.Default
+            sse("/events") {
+                heartbeat {
+                    period = 1.seconds
+                }
+                repository.all().changeFlow().collect { event ->
+                    try {
+                        val data = json.encodeToString(event)
+                        send(ServerSentEvent(data))
+                    } catch (e: Exception) {
+                        application.log.error("Failed to send event", e)
+                    }
+                }
+                application.log.info("SSE connection ended unexpectedly")
             }
         }
     }

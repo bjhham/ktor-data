@@ -236,7 +236,7 @@ class SupabaseRepository<E: Identifiable<ID>, ID>(
                 // Without `REPLICA IDENTITY FULL` the old record only carries the primary key, so
                 // the entity is best effort while the id — all a delete really needs — is not.
                 val id = oldRecord[idColumn]?.let(decodeId)
-                id?.let { ChangeEvent.Deleted(it, runCatching { decodeEntity(oldRecord) }.getOrNull()) }
+                id?.let { ChangeEvent.Deleted(decodeEntity(oldRecord)) }
             }
             // Replayed initial state, not a change: `list()`/`page()` already provide it.
             is PostgresAction.Select -> null
@@ -314,7 +314,7 @@ class SupabaseRepository<E: Identifiable<ID>, ID>(
                             .mapNotNull { it.toChangeEvent() }
                             // Deletes that couldn't carry an entity are passed through, matching
                             // ObservableListRepository: the id is still worth reporting.
-                            .filter { event -> event.entity?.let(matches) ?: true }
+                            .filter { event -> matches(event.entity) }
                     )
                 } finally {
                     withContext(NonCancellable) { realtime.removeChannel(channel) }

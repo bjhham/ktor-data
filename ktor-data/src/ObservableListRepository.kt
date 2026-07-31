@@ -22,7 +22,7 @@ class ObservableListRepository<E: Identifiable<ID>, ID>(
     private val sharedFlow = MutableSharedFlow<ChangeEvent<E>>()
 
     override fun find(predicate: Predicate): ObservableSelection<E, ID> =
-        ObservableListSelection(predicate.toBooleanFunction())
+        ObservableListSelection(predicate, predicate.toBooleanFunction())
 
     override suspend fun create(e: E) {
         createAndGet(e)
@@ -76,7 +76,7 @@ class ObservableListRepository<E: Identifiable<ID>, ID>(
         updateMutex.withLock {
             list = list.filterNot {
                 if (it.id == id) {
-                    sharedFlow.emit(ChangeEvent.Deleted(id, it))
+                    sharedFlow.emit(ChangeEvent.Deleted(it))
                     true
                 } else false
             }
@@ -86,11 +86,11 @@ class ObservableListRepository<E: Identifiable<ID>, ID>(
     override suspend fun get(id: ID): E? =
         list.find { it.id == id }
 
-    internal inner class ObservableListSelection(val predicate: (E) -> Boolean): ObservableSelection<E, ID> {
-        override suspend fun list() = list.filter(predicate)
+    internal inner class ObservableListSelection(val predicate: Predicate, val filter: (E) -> Boolean): ObservableSelection<E, ID> {
+        override suspend fun list() = list.filter(filter)
 
         override suspend fun page(limit: UInt?, offset: UInt?): Page<E> {
-            val matches = list.filter(predicate)
+            val matches = list.filter(filter)
             val afterOffset = if (offset != null) matches.drop(offset.toInt()) else matches
             val items = if (limit != null) afterOffset.take(limit.toInt()) else afterOffset
             return items.asPage(total = matches.size.toUInt())
@@ -100,7 +100,7 @@ class ObservableListRepository<E: Identifiable<ID>, ID>(
             updateMutex.withLock {
                 val mappingFunction = values.toMappingFunction()
                 list = list.map { e ->
-                    if (predicate(e)) {
+                    if (filter(e)) {
                         mappingFunction(e).also {
                             sharedFlow.emit(ChangeEvent.Updated(e))
                         }
@@ -112,8 +112,8 @@ class ObservableListRepository<E: Identifiable<ID>, ID>(
         override suspend fun deleteAll() {
             updateMutex.withLock {
                 list = list.filterNot { e ->
-                    if (predicate(e)) {
-                        sharedFlow.emit(ChangeEvent.Deleted(e.id, e))
+                    if (filter(e)) {
+                        sharedFlow.emit(ChangeEvent.Deleted(e))
                         true
                     } else false
                 }
@@ -121,16 +121,16 @@ class ObservableListRepository<E: Identifiable<ID>, ID>(
         }
 
         override suspend fun single(): E =
-            list.single(predicate)
+            list.single(filter)
 
         override suspend fun count(): UInt =
-            list.count(predicate).toUInt()
+            list.count(filter).toUInt()
 
         override suspend fun changeFlow(): Flow<ChangeEvent<E>> =
             when(predicate) {
                 Predicate.Everything -> sharedFlow.asSharedFlow()
                 Predicate.Nothing -> emptyFlow()
-                else -> sharedFlow.asSharedFlow().filter { it.entity?.let(predicate) ?: true }
+                else -> sharedFlow.asSharedFlow().filter { filter(it.entity) }
             }
 
     }

@@ -5,6 +5,8 @@ dependencies:
   - $ktor.server.core
   - $ktor.server.contentNegotiation
   - $libs.ktor.server.openapi
+  - $libs.ktor.server.sse
+  - $ktor.serialization.kotlinx.json
 
 settings:
   ktor:

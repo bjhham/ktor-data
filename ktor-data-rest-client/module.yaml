@@ -3,16 +3,30 @@ product:
   platforms: [ jvm, android, iosArm64, iosSimulatorArm64, iosX64 ]
 
 dependencies:
-  - $ktor.client.core
+  - $ktor.client.core: exported
+  - $ktor.client.contentNegotiation: exported
+  - $ktor.sse: exported
+  - $ktor.serialization.kotlinx.json: exported
   - $ktor.client.cio
-  - $ktor.client.contentNegotiation
-  - $ktor.serialization.kotlinx.json
   - ../ktor-data
+
+test-dependencies@jvm:
+  - ../ktor-data-rest-server
+  - ../ktor-data-serialization
+  - $ktor.server.testHost
+  - $ktor.server.contentNegotiation
+  - $ktor.server.sse
+  - $ktor.server.statusPages
+  - $libs.logback.classic
 
 settings:
   ktor:
     enabled: true
     version: 3.6.0-eap-1648
+  kotlin:
+    serialization:
+      enabled: true
+      version: 1.11.0
 
 repositories:
   - https://redirector.kotlinlang.org/maven/ktor-eap

@@ -8,8 +8,9 @@ dependencies:
   - $ktor.server.netty
   - $ktor.server.contentNegotiation
   - $ktor.server.statusPages
-  - $ktor.serialization.kotlinx.json
+  - $ktor.server.sse
   - $ktor.server.swagger
+  - $ktor.serialization.kotlinx.json
   - $libs.ktor.server.di
   - $libs.ktor.server.openapi
   - $libs.logback.classic
