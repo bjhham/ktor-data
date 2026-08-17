@@ -15,11 +15,6 @@ import io.ktor.server.util.*
 import io.ktor.sse.ServerSentEvent
 import io.ktor.utils.io.*
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.JsonNull
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.jvm.jvmErasure
@@ -69,7 +64,7 @@ inline fun <reified E: Identifiable<ID>, reified ID: Any> Route.restEndpoint(
                 it.key !in PAGINATION_PARAM_NAMES
             }.map { (key, values) ->
                 when (val value = values.singleOrNull()) {
-                    null -> IsOneOf(Field<Any?>(key), values)
+                    null -> OneOf(Field<Any?>(key), values)
                     else -> Equals(Field<Any?>(key), value)
                 }
             }.takeIf { it.isNotEmpty() }?.reduce(Predicate::and) ?: Everything

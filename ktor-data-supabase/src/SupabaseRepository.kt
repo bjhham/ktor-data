@@ -202,18 +202,42 @@ class SupabaseRepository<E: Identifiable<ID>, ID>(
             Everything -> {}
             // A primary key is never null, so this matches no rows. Reachable only from inside a
             // logical grouping; the selection short-circuits a top level `Nothing` without a request.
-            Predicate.Nothing -> filter(idColumn, FilterOperator.IS, null)
-            is Equals -> when (val value = predicate.value) {
-                null -> filter(predicate.field.name, FilterOperator.IS, null)
-                else -> filter(predicate.field.name, FilterOperator.EQ, value)
+            Nothing -> filter(idColumn, FilterOperator.IS, null)
+            is FieldComparison -> fieldFilterOperation(predicate).let { (operator, value) ->
+                filter(predicate.field.name, operator, value)
             }
-            is IsOneOf<*> -> isIn(predicate.field.name, predicate.values.filterNotNull())
-            is StringContains -> like(predicate.field.name, "%${predicate.value}%")
-            is CollectionContains<*> -> contains(predicate.field.name, predicate.value.filterNotNull())
+            is Not -> applyNegatedPredicate(predicate.predicate)
             is And -> and { predicate.clauses.forEach { applyPredicate(it) } }
             is Or -> or { predicate.clauses.forEach { applyPredicate(it) } }
         }
     }
+
+    /** The [Not.predicate]-negated counterpart of [applyPredicate]. */
+    private fun PostgrestFilterBuilder.applyNegatedPredicate(predicate: Predicate) {
+        when (predicate) {
+            Everything -> filter(idColumn, FilterOperator.IS, null)
+            Predicate.Nothing -> {}
+            is FieldComparison -> fieldFilterOperation(predicate).let { (operator, value) ->
+                filterNot(predicate.field.name, operator, value)
+            }
+            is Not -> applyPredicate(predicate.predicate)
+            is And -> and(negate = true) { predicate.clauses.forEach { applyPredicate(it) } }
+            is Or -> or(negate = true) { predicate.clauses.forEach { applyPredicate(it) } }
+        }
+    }
+
+    /** The PostgREST (operator, value) pair equivalent to [predicate], for use with `filter`/`filterNot`. */
+    private fun fieldFilterOperation(predicate: FieldComparison): Pair<FilterOperator, Any?> =
+        when (predicate) {
+            is Equals -> (if (predicate.expected == null) FilterOperator.IS else FilterOperator.EQ) to predicate.expected
+            is OneOf<*> -> FilterOperator.IN to predicate.expected.filterNotNull()
+            is StringContains -> FilterOperator.LIKE to "%${predicate.expected}%"
+            is CollectionContains<*> -> FilterOperator.CS to listOfNotNull(predicate.expected)
+            is GreaterThan<*> -> FilterOperator.GT to predicate.expected
+            is GreaterThanOrEqualTo<*> -> FilterOperator.GTE to predicate.expected
+            is LessThan<*> -> FilterOperator.LT to predicate.expected
+            is LessThanOrEqualTo<*> -> FilterOperator.LTE to predicate.expected
+        }
 
     /**
      * The part of [predicate] that `postgres_changes` can evaluate server side, or null when it
@@ -223,8 +247,8 @@ class SupabaseRepository<E: Identifiable<ID>, ID>(
      */
     private fun realtimeFilter(predicate: Predicate): FilterOperation? =
         when (predicate) {
-            is Equals -> predicate.value?.let { FilterOperation(predicate.field.name, FilterOperator.EQ, it) }
-            is IsOneOf<*> -> FilterOperation(predicate.field.name, FilterOperator.IN, predicate.values.filterNotNull())
+            is Equals -> predicate.expected?.let { FilterOperation(predicate.field.name, FilterOperator.EQ, it) }
+            is OneOf<*> -> FilterOperation(predicate.field.name, FilterOperator.IN, predicate.expected.filterNotNull())
             else -> null
         }
 

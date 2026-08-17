@@ -464,26 +464,39 @@ open class ExposedR2dbcRepository<E: Identifiable<ID>, ID: Comparable<ID>>(
             Nothing -> Op.FALSE
             is And -> AndOp(predicate.clauses.map(::toBooleanOp))
             is Or -> OrOp(predicate.clauses.map(::toBooleanOp))
+            is Not -> not(toBooleanOp(predicate.predicate))
             is Equals -> table[predicate.field.name].let { column ->
-                when(val value = predicate.value) {
+                when(val value = predicate.expected) {
                     null -> column.isNull()
                     else -> column.eq(column.coerce(value))
                 }
             }
-            is IsOneOf<*> -> table[predicate.field.name].let { column ->
+            is OneOf<*> -> table[predicate.field.name].let { column ->
                 // `coerce` unwraps EntityID-typed columns to their inner column type, so the
                 // values it produces are raw (e.g. UInt) rather than EntityID instances. Bind
                 // each value through the inner column when present, so `SingleValueInListOp`
                 // uses a column type that matches those raw values — otherwise the original
                 // column's EntityIDColumnType would try to cast UInt to EntityID at bind time.
                 val expr = (column.columnType as? EntityIDColumnType<*>)?.idColumn ?: column
-                SingleValueInListOp(expr, predicate.values.map {
+                SingleValueInListOp(expr, predicate.expected.map {
                     column.coerce(it).value as Any
                 })
             }
             is StringContains -> table[predicate.field.name].let { column ->
                 column as Column<String>
-                column.like("%${predicate.value}%")
+                column.like("%${predicate.expected}%")
+            }
+            is GreaterThan<*> -> table[predicate.field.name].let { column ->
+                column.greater(column.coerce(predicate.expected))
+            }
+            is GreaterThanOrEqualTo<*> -> table[predicate.field.name].let { column ->
+                column.greaterEq(column.coerce(predicate.expected))
+            }
+            is LessThan<*> -> table[predicate.field.name].let { column ->
+                column.less(column.coerce(predicate.expected))
+            }
+            is LessThanOrEqualTo<*> -> table[predicate.field.name].let { column ->
+                column.lessEq(column.coerce(predicate.expected))
             }
             is CollectionContains<*> -> throw UnsupportedOperationException(
                 "CollectionContains predicates are not supported by ExposedR2dbcRepository. " +

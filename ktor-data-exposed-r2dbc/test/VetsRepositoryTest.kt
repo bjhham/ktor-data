@@ -3,20 +3,16 @@ package io.ktor.data.exposed.r2dbc
 import io.ktor.data.Field
 import io.ktor.data.Repository
 import io.ktor.data.Predicate.*
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.r2dbc.R2dbcDatabase
 import org.jetbrains.exposed.v1.r2dbc.SchemaUtils
 import org.jetbrains.exposed.v1.r2dbc.insert
-import org.jetbrains.exposed.v1.r2dbc.selectAll
 import org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class VetsRepositoryTest {
 
@@ -64,7 +60,7 @@ class VetsRepositoryTest {
 
         assertEquals(
             listOf(dentistry, surgery),
-            skills.find(IsOneOf(Field<UInt>("id"), listOf(dentistry.id, surgery.id))).list()
+            skills.find(OneOf(Field<UInt>("id"), listOf(dentistry.id, surgery.id))).list()
         )
 
         suspendTransaction(db) {

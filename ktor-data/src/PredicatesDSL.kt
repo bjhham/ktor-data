@@ -34,14 +34,37 @@ fun <F> Field<F>.isEqualTo(value: F): Predicate =
     Equals(this, value)
 
 fun <F> Field<F>.isOneOf(values: Iterable<F>): Predicate =
-    IsOneOf(this, values)
+    OneOf(this, values)
 
 fun <F> Field<F>.isOneOf(vararg values: F): Predicate =
-    IsOneOf(this, values.toList())
+    OneOf(this, values.toList())
 
 fun Field<String>.contains(value: String): Predicate =
     StringContains(this, value)
 
-fun <F> Field<Collection<F>>.contains(value: Collection<F>): Predicate =
+fun <F> Field<Collection<F>>.contains(value: F): Predicate =
     CollectionContains(this, value)
+
+fun <F: Comparable<F>> Field<F>.isGreaterThan(value: F): Predicate =
+    GreaterThan(this, value)
+
+fun <F: Comparable<F>> Field<F>.isGreaterThanOrEqualTo(value: F): Predicate =
+    GreaterThanOrEqualTo(this, value)
+
+fun <F: Comparable<F>> Field<F>.isLessThan(value: F): Predicate =
+    LessThan(this, value)
+
+fun <F: Comparable<F>> Field<F>.isLessThanOrEqualTo(value: F): Predicate =
+    LessThanOrEqualTo(this, value)
+
+fun <F: Comparable<F>> Field<F>.isBetween(lower: F, upper: F): Predicate =
+    isGreaterThanOrEqualTo(lower) and isLessThanOrEqualTo(upper)
+
+operator fun Predicate.not(): Predicate =
+    when(this) {
+        Everything -> Nothing
+        Nothing -> Everything
+        is Not -> predicate
+        else -> Not(this)
+    }
 

@@ -34,4 +34,5 @@ fun Predicate.toAssignmentsBooleanFunction(): (FieldValues) -> Boolean =
         is FieldClause -> { map -> map.entries.any { (key, value) -> test(key, value) } }
         is And -> clauses.map(Predicate::toAssignmentsBooleanFunction).let { predicates -> { list -> predicates.all { it(list) } } }
         is Or -> clauses.map(Predicate::toAssignmentsBooleanFunction).let { predicates -> { list -> predicates.any { it(list) } } }
+        is Not -> predicate.toAssignmentsBooleanFunction().let { inner -> { list -> !inner(list) } }
     }
